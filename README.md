@@ -1,6 +1,6 @@
 # despesas
 
-A new Flutter project.
+A new Flutter project where you can keep track of your expenses.
 
 ## Getting Started
 

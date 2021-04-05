@@ -17,6 +17,12 @@ class MyHomePage extends StatelessWidget {
       title: 'hotone ampero',
       value: 2500.00,
       date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'Colchão Ortobom',
+      value: 2800.00,
+      date: DateTime.now(),
     )
   ];
   @override
@@ -36,9 +42,13 @@ class MyHomePage extends StatelessWidget {
               child: Text('Grafico'),
             ),
           ),
-          Card(
-            child: Text('Lista de transações'),
-          )
+          Column(children: [
+            ..._transactions
+                .map((tr) => Card(
+                      child: Text(tr.title),
+                    ))
+                .toList(),
+          ]),
         ],
       ),
     );
