@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TransactionForm extends StatelessWidget {
   final titleController = TextEditingController();
@@ -7,6 +8,15 @@ class TransactionForm extends StatelessWidget {
   final void Function(String, double) onSubmit;
 
   TransactionForm(this.onSubmit);
+
+  _submitForm() {
+    final title = titleController.text;
+    final value = double.tryParse(valueController.text.replaceAll(',', '.'));
+    if (title.isEmpty || value <= 0) {
+      return;
+    }
+    onSubmit(title, value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +28,20 @@ class TransactionForm extends StatelessWidget {
           children: [
             TextField(
               controller: titleController,
+              maxLength: 20,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: 'Título',
               ),
             ),
             TextField(
               controller: valueController,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(new RegExp('[\\-|\\ ]')),
+                FilteringTextInputFormatter.allow(RegExp(r'\.|,|[0-9]')),
+              ],
+              onSubmitted: (_) => _submitForm(),
               decoration: InputDecoration(
                 labelText: 'Valor (R\$)',
               ),
@@ -32,11 +50,7 @@ class TransactionForm extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: () {
-                    final title = titleController.text;
-                    final value = double.tryParse(valueController.text);
-                    onSubmit(title, value);
-                  },
+                  onPressed: _submitForm,
                   child: Text(
                     'Nova Transação',
                     style: TextStyle(color: Colors.purple) ?? 0.0,

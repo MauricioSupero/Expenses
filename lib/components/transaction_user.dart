@@ -24,6 +24,18 @@ class _TransactionUserState extends State<TransactionUser> {
       title: 'Colchão Ortobom',
       value: 2800.00,
       date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't3',
+      title: 'titulo tesouro direto',
+      value: 998.00,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't4',
+      title: 'titulo tesouro pós fixado',
+      value: 998.00,
+      date: DateTime.now(),
     )
   ];
 
