@@ -1,12 +1,15 @@
+import 'dart:math';
+import 'dart:io';
+
 import 'package:despesas/components/chart.dart';
 import 'package:despesas/components/transaction_form.dart';
+import 'package:despesas/models/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+
 import 'components/transaction_form.dart';
-import 'dart:math';
 import 'components/transaction_list.dart';
-import 'package:despesas/models/transaction.dart';
 
 main() => runApp(ExpensesApp());
 
@@ -49,25 +52,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [
-    // Transaction(
-    //   id: 't2',
-    //   title: 'Colchão Ortobom',
-    //   value: 2800.00,
-    //   date: DateTime.now().subtract(Duration(days: 5)),
-    // ),
-    // Transaction(
-    //   id: 't3',
-    //   title: 'titulo tesouro direto',
-    //   value: 998.00,
-    //   date: DateTime.now().subtract(Duration(days: 10)),
-    // ),
-    // Transaction(
-    //   id: 't4',
-    //   title: 'titulo tesouro pós fixado',
-    //   value: 998.00,
-    //   date: DateTime.now().subtract(Duration(days: 1)),
-    // )
+    Transaction(
+      id: 't7',
+      title: 'titulo tesouro pós fixado',
+      value: 998.00,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    )
   ];
+  bool _showChart = false;
 
   List<Transaction> get _recentTransactions {
     return _transactions.where((tr) {
@@ -98,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _openTransactionFormModal(BuildContext context) {
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         builder: (_) {
           return TransactionForm(_addTransaction);
@@ -106,29 +99,69 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Despesas Pessoais'),
-        actions: [
+    final mediaQuery = MediaQuery.of(context);
+    bool isLandscape = mediaQuery.orientation == Orientation.landscape;
+    final appBar = AppBar(
+      title: Text('Despesas Pessoais'),
+      actions: [
+        if (isLandscape)
           IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _openTransactionFormModal(context),
-          )
-        ],
-      ),
+            icon: Icon(_showChart ? Icons.list : Icons.pie_chart),
+            onPressed: () {
+              setState(() {
+                _showChart = !_showChart;
+              });
+            },
+          ),
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => _openTransactionFormModal(context),
+        ),
+      ],
+    );
+    final availableHeight = mediaQuery.size.height -
+        appBar.preferredSize.height -
+        mediaQuery.padding.top;
+
+    return Scaffold(
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Chart(_recentTransactions),
-            TransactionList(_transactions, _deleteTransaction),
+            // if (isLandscape)
+            //   Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       Text('Exibir Gráfico'),
+            //       Switch(
+            //           value: _showChart,
+            //           onChanged: (value) {
+            //             setState(() {
+            //               _showChart = value;
+            //             });
+            //           }),
+            //     ],
+            //   ),
+            if (_showChart || !isLandscape)
+              Container(
+                height: availableHeight * (isLandscape ? 0.7 : 0.3),
+                child: Chart(_recentTransactions),
+              ),
+            if (!_showChart || !isLandscape)
+              Container(
+                height: availableHeight * (isLandscape ? 1 : 0.7),
+                child: TransactionList(_transactions, _deleteTransaction),
+              ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => _openTransactionFormModal(context),
-      ),
+      floatingActionButton: Platform.isIOS
+          ? Container()
+          : FloatingActionButton(
+              child: Icon(Icons.add),
+              onPressed: () => _openTransactionFormModal(context),
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
