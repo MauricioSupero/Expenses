@@ -3,7 +3,6 @@ import 'package:despesas/components/adaptative_textfield.dart';
 import 'package:easy_mask/easy_mask.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'adaptative_button.dart';
 
 class TransactionForm extends StatefulWidget {
